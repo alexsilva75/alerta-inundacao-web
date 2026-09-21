@@ -20,6 +20,8 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import {useNavigate} from 'react-router';
 
+import {useAuth} from '../contexts/AuthContext'
+
 const pontos = [
     {
         id: 1,
@@ -76,6 +78,8 @@ const getNivelColor = (nivel: string) => {
 };
 
 export function Home() {
+    const {user} = useAuth();
+
     const navigate = useNavigate();
     
     return (
@@ -103,11 +107,32 @@ export function Home() {
                     </Typography>
                 </Box>
                 <Box sx={{pr: 2}}>
-                    <Button 
+                    {user? (<Box>
+                        <Typography>
+                            Olá, {user.name}!
+
+                        </Typography>
+                        <Button
+                            onClick={()=> navigate('/dashboard')}
+                            sx={{ml: 2}}>
+                            Dashboard
+                        </Button>
+                    </Box>):(
+                        <Box>
+                        <Button 
                         onClick={() => navigate('/login')}
                         variant="contained">
                         Entrar
                     </Button>
+                    <Button
+                        sx={{ml:2}}
+                        variant="text"
+                        onClick={() => navigate('/register')}
+                    >
+                        Registrar
+                    </Button>
+                    </Box>
+                    )}
                 </Box>
             </Box>
 
