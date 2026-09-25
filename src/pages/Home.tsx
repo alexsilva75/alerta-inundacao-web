@@ -21,6 +21,10 @@ import "leaflet/dist/leaflet.css";
 import {useNavigate} from 'react-router';
 
 import {useAuth} from '../contexts/AuthContext'
+import { reverseGeocoding } from "../services/geocoding-service";
+import { useEffect, useState, type Key } from "react";
+import { fetchIncidentes } from "../services/incidentes-service";
+import type { GeocodingResponse } from "../services/geocoding-service";
 
 const pontos = [
     {
@@ -77,11 +81,65 @@ const getNivelColor = (nivel: string) => {
     }
 };
 
+import type { FetchIncidenteDto as Incidente } from "../dto/FetchIncidenteDto";
+
 export function Home() {
     const {user} = useAuth();
+    const [coords, setCoords] = useState<{lat: Number, lng: Number}>({lat: -12.5571238, lng: -38.7343115});
+    const [cidade, setCidade] = useState<string | null>(null);
+    const [uf, setUf] = useState<string | null>(null);
+    const [incidentes, setIncidentes] = useState<Incidente[] | []>([]);
+
 
     const navigate = useNavigate();
+
+    useEffect(() => {       
+        
+        if("geolocation" in navigator) {
+            console.log("Obtendo localização");
+            navigator.geolocation.getCurrentPosition(function(position) {
+                console.log("Obtendo coordenadas.");
+                setCoords({lat: position.coords.latitude,
+                            lng: position.coords.longitude});             
+                
+                
+            }, function(err){
+                console.log(err)
+                if(err.code == 2){                    
+                    setCoords({lat: -12.5571238, lng: -38.7343115})
+                }
+            }, {});        
+        }
+},[]);
     
+
+    useEffect(() => {
+
+        async function resolveGeocoding(lat: Number, lng: Number){
+            const geocoding = await reverseGeocoding(lat, lng);
+            setUf(geocoding.principalSubdivisionCode.split('-')[1]);
+            setCidade(geocoding.city);
+        }
+        
+        if(coords){
+            console.log('USER COORDINATES: ', coords);
+            resolveGeocoding(coords.lat, coords.lng);            
+        }
+    },[coords]);
+
+
+    useEffect(() => {
+        async function loadIncidentes(cidade: string, uf: string){
+            const incidentesData = await fetchIncidentes(cidade, uf);
+            setIncidentes(incidentesData);
+        }
+
+        if(cidade && uf){
+
+            loadIncidentes(cidade, uf);
+        }
+    },[cidade])
+
     return (
         <Box sx={{ p: { xs: 2, md: 3 } }}>
 
@@ -267,7 +325,7 @@ export function Home() {
                         }}
                     >
                         <MapContainer
-                            center={[-12.548, -39.258] as LatLngExpression }
+                            center={[coords.lat, coords.lng] as [number, number] }
 
                             zoom={13}
                             scrollWheelZoom
@@ -282,15 +340,15 @@ export function Home() {
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
 
-                            {pontos.map((ponto) => (
+                            {incidentes.map((ponto) => (
                                 <Marker
-                                    key={ponto.id}
-                                    position={ponto.coordenadas}
+                                    key={ponto.id as Key}
+                                    position={[ponto.latitude, ponto.longitude] as [number, number]}
                                 >
                                     <Popup>
-                                        <strong>{ponto.nome}</strong>
+                                        <strong>{ponto.titulo}</strong>
                                         <br />
-                                        Nível: {ponto.nivel}
+                                        Nível: {ponto.nivel_severidade}
                                     </Popup>
                                 </Marker>
                             ))}
