@@ -82,7 +82,7 @@ export function Login() {
                                     fontWeight: "bold",
                                 }}
                             >
-                                Conta Alerta
+                                Alerta de Inundações
                             </Typography>
 
                             {error && (
@@ -102,7 +102,7 @@ export function Login() {
                                     setEmail(event.target.value);
                                 }}
                                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>{
-                                    if(event.key === 'enter'){
+                                    if(event.key === 'Enter'){
                                         handleLogin(event);
                                     }
                                 }}
@@ -119,7 +119,7 @@ export function Login() {
                                     setPassword(event.target.value);
                                 }}
                                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>{
-                                    if(event.key === 'enter'){
+                                    if(event.key === 'Enter'){
                                         handleLogin(event);
                                     }
                                 }}

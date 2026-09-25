@@ -17,7 +17,7 @@ export const userService ={
                         {
                             auth: false,
                             method: 'POST',
-                            body: JSON.stringify(userData),
+                            body: userData,
                             
                         });              
                 

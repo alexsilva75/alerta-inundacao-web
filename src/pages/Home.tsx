@@ -9,6 +9,7 @@ import {
     Paper,
     Stack,
     Typography,
+    CircularProgress,
 } from "@mui/material";
 
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -23,8 +24,10 @@ import {useNavigate} from 'react-router';
 import {useAuth} from '../contexts/AuthContext'
 import { reverseGeocoding } from "../services/geocoding-service";
 import { useEffect, useState, type Key } from "react";
-import { fetchIncidentes } from "../services/incidentes-service";
+import { fetchHomeData } from "../services/home-service";
+import type { Stats } from "../services/home-service";
 import type { GeocodingResponse } from "../services/geocoding-service";
+import {formatDate, tempoRelativo} from '../utils/dateFormat';
 
 const pontos = [
     {
@@ -89,6 +92,8 @@ export function Home() {
     const [cidade, setCidade] = useState<string | null>(null);
     const [uf, setUf] = useState<string | null>(null);
     const [incidentes, setIncidentes] = useState<Incidente[] | []>([]);
+    const [stats, setStats] = useState<Stats | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
 
     const navigate = useNavigate();
@@ -129,16 +134,18 @@ export function Home() {
 
 
     useEffect(() => {
-        async function loadIncidentes(cidade: string, uf: string){
-            const incidentesData = await fetchIncidentes(cidade, uf);
-            setIncidentes(incidentesData);
+        async function loadHomeData(cidade: string, uf: string){
+            const homeData = await fetchHomeData(cidade, uf);
+            setIncidentes(homeData.data.incidentes);
+            setStats(homeData.data.stats);     
+            setLoading(false);       
         }
 
         if(cidade && uf){
 
-            loadIncidentes(cidade, uf);
+            loadHomeData(cidade, uf);
         }
-    },[cidade])
+    },[cidade, uf])
 
     return (
         <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -212,16 +219,16 @@ export function Home() {
                                         variant="body2"
                                         color="text.secondary"
                                     >
-                                        Pontos monitorados
+                                        Incidentes na Região
                                     </Typography>
 
-                                    <Typography 
+                                    {loading ? <CircularProgress /> :<Typography 
                                         variant="h4" 
                                         sx={{
                                                 fontWeight: 700
                                             }}>
-                                        12
-                                    </Typography>
+                                        {stats && stats.total_incidentes?.toString()}
+                                    </Typography>}
                                 </Box>
 
                                 <LocationOnIcon
@@ -251,14 +258,15 @@ export function Home() {
                                         Alertas ativos
                                     </Typography>
 
+                                    {loading? <CircularProgress /> :
                                     <Typography
                                         variant="h4"
                                         sx={{
                                                 fontWeight: 700
                                             }}
                                     >
-                                        3
-                                    </Typography>
+                                        {stats && stats.incidentes_ativos?.toString()}
+                                    </Typography>}
                                 </Box>
 
                                 <WarningAmberIcon
@@ -286,17 +294,17 @@ export function Home() {
                                         variant="body2"
                                         color="text.secondary"
                                     >
-                                        Última atualização
+                                        Último incidente
                                     </Typography>
 
-                                    <Typography
+                                    {loading ? <CircularProgress /> :<Typography
                                         variant="h6"
                                         sx={{
                                             fontWeight: 700
                                         }}
                                     >
-                                        13:08
-                                    </Typography>
+                                        {stats && formatDate(stats.ultimo_incidente)}
+                                    </Typography>}
                                 </Box>
 
                                 <UpdateIcon
@@ -340,7 +348,7 @@ export function Home() {
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
 
-                            {incidentes.map((ponto) => (
+                            {incidentes.length > 0 ? (incidentes.map((ponto) => (
                                 <Marker
                                     key={ponto.id as Key}
                                     position={[ponto.latitude, ponto.longitude] as [number, number]}
@@ -351,7 +359,7 @@ export function Home() {
                                         Nível: {ponto.nivel_severidade}
                                     </Popup>
                                 </Marker>
-                            ))}
+                            ))) : (<div>Loading...</div>)}
 
                         </MapContainer>
                     </Paper>
@@ -391,9 +399,9 @@ export function Home() {
 
                         <Stack spacing={2}>
 
-                            {pontos.map((ponto) => (
+                            {!loading ? incidentes.map((ponto) => (
                                 <Card
-                                    key={ponto.id}
+                                    key={ponto.id as Key}
                                     variant="outlined"
                                     sx={{
                                         cursor: "pointer",
@@ -425,22 +433,22 @@ export function Home() {
                                                         fontWeight: 700
                                                     }}
                                                 >
-                                                    {ponto.nome}
+                                                    {ponto.titulo}
                                                 </Typography>
 
                                                 <Typography
                                                     variant="body2"
                                                     color="text.secondary"
                                                 >
-                                                    {ponto.localizacao}
+                                                    {ponto.bairro}
                                                 </Typography>
                                             </Box>
 
                                             <Chip
-                                                label={ponto.nivel}
+                                                label={ponto.nivel_severidade}
                                                 color={
                                                     getNivelColor(
-                                                        ponto.nivel
+                                                        ponto.nivel_severidade
                                                     ) as
                                                         | "error"
                                                         | "warning"
@@ -467,14 +475,18 @@ export function Home() {
                                                 mt: 1.5,
                                             }}
                                         >
-                                            Atualizado {ponto.atualizado}
+                                            Atualizado {tempoRelativo(ponto.created_at)}
                                         </Typography>
 
                                     </CardContent>
 
                                 </Card>
-                            ))}
-
+                            )) : <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                    <CircularProgress />
+                                </Box>}
+                            {!loading && incidentes.length === 0 && <Box>
+                                    <p>Nenhum ponto de incidente encontrado.</p>
+                                </Box>}
                         </Stack>
 
                     </Paper>

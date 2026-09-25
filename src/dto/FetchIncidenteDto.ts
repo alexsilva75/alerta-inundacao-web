@@ -1,7 +1,7 @@
 export interface FetchIncidenteDto{
     id: Number,
     titulo : string,
-    descrição : string,
+    descricao : string,
     data_hora : string,
     bairro : string,
     cidade : string,
@@ -9,4 +9,5 @@ export interface FetchIncidenteDto{
     latitude : Number,
     longitude : Number,
     nivel_severidade: string,
+    created_at: string,
 }

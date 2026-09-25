@@ -15,8 +15,8 @@ export const authService ={
     
     login(email: string, password: string): Promise<LoginResponse>{
         return api('login', {
-            body: JSON.stringify({email,
-            password}),
+            body: {email,
+            password},
             method: 'POST',
             auth: false,
         });

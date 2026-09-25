@@ -3,7 +3,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 interface FetchOptions{
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
     headers?: {[key: string]: string};
-    body?: any;
+    body?: BodyInit | object;
     auth?: boolean;
 }
 
@@ -25,18 +25,25 @@ export const api = async <T>(endpoint: string, options: FetchOptions = {auth: tr
         }
     }
 
-    headers.set('Content-Type', 'application/json');
+    let body = undefined;
+
+    if(options.body && !(options.body instanceof FormData)){
+        headers.set('Content-Type', 'application/json');
+        body = JSON.stringify(options.body);
+    }else{
+        body = options.body;
+
+    }
+
     headers.set('Accept', 'application/json');
 
-    // console.log('Request Body: ', options.body);
-
-    
+    // console.log('Request Body: ', options.body);    
 
     try {   
         const response = await fetch(`${API_URL}/${endpoint}`, {
             method: options.method || 'GET', 
             headers: headers, 
-            body: options.body
+            body: body
         });     
         
         if(!response.ok){

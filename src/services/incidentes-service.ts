@@ -1,21 +1,18 @@
-import type { FetchIncidenteDto } from "../dto/FetchIncidenteDto";
-import { api } from "./api";
+import {api} from './api'
 
-interface IncidentesResponse{
-    message: string;
-    data: FetchIncidenteDto[];
-}
-
-export async function fetchIncidentes(cidade: string, uf: string): Promise<FetchIncidenteDto[]>{
-    const url = `incidentes/home-search?cidade=${cidade}&uf=${uf}`;
-    console.log('URL:', url);
+export async function saveIncidente(formData: FormData){
     try{
-        const response = await api<IncidentesResponse>(url);
-        console.log('INCIDENTES: ', response);
-        return response.data as FetchIncidenteDto[];   
 
+        return await  api('incidentes', {
+            method:'POST',
+            body: formData,
+            auth: true,
+            
+        })
+
+            
     }catch(error){
-        console.log('Falha ao buscar incidentes: ', error);
-        throw new Error('Não foi possível buscar incidentes.');
+        console.log('ERRO SALVANDO INCIDENTE: ', error);
+        throw new Error("Erro ao salvar incidente");
     }
 }

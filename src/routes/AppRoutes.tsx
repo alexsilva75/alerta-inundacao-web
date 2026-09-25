@@ -5,6 +5,7 @@ import { Dashboard } from '../pages/protected/dashboard/Dashboard';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Register } from '../pages/Register';
+import { NewIncidente } from '../pages/protected/incidentes/NewIncidente';
 
 
 export function AppRoutes(){
@@ -16,7 +17,8 @@ export function AppRoutes(){
                 <Route path="/login" element={<Login />} />
                 <Route element={<AuthLayout />}>
                     <Route element={<ProtectedRoute />}>
-                        <Route path="/dashboard" element={<Dashboard />} />              
+                        <Route path="/dashboard" element={<Dashboard />} /> 
+                        <Route path="/incidentes/registrar" element={<NewIncidente/>} />             
                     </Route>
                 </Route>                
             </Routes>
