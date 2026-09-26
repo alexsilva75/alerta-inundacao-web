@@ -10,4 +10,6 @@ export interface FetchIncidenteDto{
     longitude : Number,
     nivel_severidade: string,
     created_at: string,
+    foto_url: string,
+    ativo: boolean,
 }

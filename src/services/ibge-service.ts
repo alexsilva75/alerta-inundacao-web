@@ -1,4 +1,20 @@
+import municipios from '../utils/data/ibge/municipios.json';
 
+export interface Municipio {
+    codigo: string;
+    nome: string;
+    uf: string;
+    latitude: number;
+    longitude: number;
+}
+
+const municipiosData = municipios as Municipio[];
+
+export function fetchMunicipios(uf: string): Municipio[] {
+    return municipiosData.filter(
+        municipio => municipio.uf === uf
+    );
+}
 
 export async function fetchCidadesPorUF(uf: string): Promise<string[] | []> {
     try {

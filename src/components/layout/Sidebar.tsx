@@ -10,7 +10,9 @@ import {
     Search as SearchIcon,
     Warning as WarningIcon,
     ExpandLess,
-    ExpandMore
+    ExpandMore,
+    Add as AddIcon,
+    List as ListIcon
 } from '@mui/icons-material';
 
 import {
@@ -86,21 +88,32 @@ export function Sidebar(){
                             onClick={() => navigate('/incidentes/registrar')}
                         >
                             <ListItemIcon>
-                                <WarningIcon />
+                                <AddIcon />
                             </ListItemIcon>
 
                             <ListItemText primary="Registrar novo Incidente"/>
                         </ListItemButton>
-
-                        <ListItemButton>
+                        <ListItemButton
+                            sx={{pl: 4}}
+                            onClick={() => navigate('/incidentes')}
+                        >
                             <ListItemIcon>
-                                <SearchIcon />
+                                <ListIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Buscar incidentes" />
 
+                            <ListItemText primary="Meus Incidentes"/>
                         </ListItemButton>
+
+
+                        
                     </List>
                 </Collapse>
+                {/* <ListItemButton>
+                    <ListItemIcon>
+                        <SearchIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Buscar incidentes" />
+                </ListItemButton> */}
             </List>
 
         </Box>

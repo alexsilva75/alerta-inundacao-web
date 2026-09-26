@@ -6,6 +6,7 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Register } from '../pages/Register';
 import { NewIncidente } from '../pages/protected/incidentes/NewIncidente';
+import { ListUserIncidents } from '../pages/protected/incidentes/ListUserIncidents';
 
 
 export function AppRoutes(){
@@ -18,7 +19,8 @@ export function AppRoutes(){
                 <Route element={<AuthLayout />}>
                     <Route element={<ProtectedRoute />}>
                         <Route path="/dashboard" element={<Dashboard />} /> 
-                        <Route path="/incidentes/registrar" element={<NewIncidente/>} />             
+                        <Route path="/incidentes/registrar" element={<NewIncidente/>} />
+                        <Route path="/incidentes" element={<ListUserIncidents />} />             
                     </Route>
                 </Route>                
             </Routes>
