@@ -16,7 +16,7 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import UpdateIcon from "@mui/icons-material/Update";
 
-import type {LatLngExpression } from 'leaflet';
+//import type {LatLngExpression } from 'leaflet';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import {useNavigate} from 'react-router';
@@ -26,48 +26,10 @@ import { reverseGeocoding } from "../services/geocoding-service";
 import { useEffect, useState, type Key } from "react";
 import { fetchHomeData, homeSearch } from "../services/home-service";
 import type { Stats } from "../services/home-service";
-import type { GeocodingResponse } from "../services/geocoding-service";
+//import type { GeocodingResponse } from "../services/geocoding-service";
 import {formatDate, tempoRelativo} from '../utils/dateFormat';
 import { IncidentSearch } from "../components/incidentes/IncidentSearch";
 
-const pontos = [
-    {
-        id: 1,
-        nome: "Rio Subaé — Centro",
-        localizacao: "Centro",
-        nivel: "Alto",
-        descricao: "Nível da água acima do esperado.",
-        atualizado: "Há 8 minutos",
-        coordenadas: [-12.548, -39.251] as [number, number],
-    },
-    {
-        id: 2,
-        nome: "Ponte do Rio Subaé",
-        localizacao: "Zona Rural",
-        nivel: "Moderado",
-        descricao: "Elevação gradual do nível do rio.",
-        atualizado: "Há 15 minutos",
-        coordenadas: [-12.558, -39.265] as [number, number],
-    },
-    {
-        id: 3,
-        nome: "Bairro da Estação",
-        localizacao: "Bairro da Estação",
-        nivel: "Baixo",
-        descricao: "Acúmulo de água em alguns pontos.",
-        atualizado: "Há 22 minutos",
-        coordenadas: [-12.543, -39.258] as [number, number],
-    },
-    {
-        id: 4,
-        nome: "Estrada da Barragem",
-        localizacao: "Zona Rural",
-        nivel: "Moderado",
-        descricao: "Atenção para transbordamento.",
-        atualizado: "Há 31 minutos",
-        coordenadas: [-12.570, -39.280] as [number, number],
-    },
-];
 
 const getNivelColor = (nivel: string) => {
     switch (nivel) {
@@ -101,21 +63,21 @@ export function Home() {
     const [searchError, setSearchError] = useState<string | null>(null);
 
     function MapCenterUpdater({
-    latitude,
-    longitude,
-}: {
-    latitude: number;
-    longitude: number;
-}) {
-    const map = useMap();
+        latitude,
+        longitude,
+    }: {
+        latitude: number;
+        longitude: number;
+    }) {
+        const map = useMap();
 
-    useEffect(() => {
-        map.setView([latitude, longitude], map.getZoom());
-    }, [latitude, longitude, map]);
+        useEffect(() => {
+            map.setView([latitude, longitude], map.getZoom());
+        }, [latitude, longitude, map]);
 
-    return null;
-}
-    
+        return null;
+    }
+
 
     const handleIncidentClick = (incidente: Incidente) => {        
         setOpenDetailsDialog(true);

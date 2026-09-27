@@ -16,6 +16,12 @@ export function fetchMunicipios(uf: string): Municipio[] {
     );
 }
 
+export function fetchMunicipio(uf: string, nome: string): Municipio | null | undefined {
+    return municipiosData.find(
+        municipio => municipio.uf === uf && municipio.nome.toLowerCase() === nome.toLowerCase()
+    );
+}
+
 export async function fetchCidadesPorUF(uf: string): Promise<string[] | []> {
     try {
         const response = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);

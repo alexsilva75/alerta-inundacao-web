@@ -1,7 +1,6 @@
 import type { User } from '../interfaces/Usuario';
 import {api} from './api';
 import type { UserRegisterDto } from '../dto/UserRegisterDto';
-import {ApiError} from '../services/api';
 
 
 interface RegisterResponse{

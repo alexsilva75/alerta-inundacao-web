@@ -2,8 +2,7 @@ import { Box, Button, Card, CardContent, Chip, Grid, Stack, Typography } from "@
 import type { FetchIncidenteDto as Incidente } from "../../dto/FetchIncidenteDto"
 import { tempoRelativo } from "../../utils/dateFormat"
 import { getNivelColor } from "../../utils/ui"
-import { IncidentDetailsDialog } from "./IncidentDetailsDialog"
-import { useState } from "react"
+
 
 interface IncidentCardProps{
     incidente: Incidente;

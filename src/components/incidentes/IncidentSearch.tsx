@@ -21,7 +21,7 @@ import {
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
-import { fetchCidadesPorUF, fetchMunicipios } from '../../services/ibge-service';
+import { fetchMunicipios } from '../../services/ibge-service';
 import type { Municipio } from "../../services/ibge-service";
 import {ufs} from '../../utils/ufs';
 
@@ -35,7 +35,7 @@ export function IncidentSearch({ onSearch }: IncidentSearchProps) {
     const [coords, setCoords] = useState< {lat: number, lng: number}|null>(null);
 
     const [uf, setUf] = useState("");
-    const[cidades, setCidades] = useState<string[] | []>([]);
+    //const[cidades, setCidades] = useState<string[] | []>([]);
     const [cidade, setCidade] = useState<string | null>("");
     const [searchAtivo, setSearchAtivo] = useState(true);
     const [municipios, setMunicipios] = useState<Municipio[] | []>([]);

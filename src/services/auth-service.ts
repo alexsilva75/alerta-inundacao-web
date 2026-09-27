@@ -1,6 +1,5 @@
 import type { User } from '../interfaces/Usuario';
 import {api} from './api';
-import type { UserRegisterDto } from '../dto/UserRegisterDto';
 
 interface LoginResponse{
     token: string;

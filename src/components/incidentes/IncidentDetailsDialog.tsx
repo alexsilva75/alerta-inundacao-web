@@ -11,7 +11,7 @@ import {
     Skeleton,
 } from '@mui/material';
 
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import type { FetchIncidenteDto } from '../../dto/FetchIncidenteDto';
 import { formatDate } from '../../utils/dateFormat';
 import { ReadonlyMap } from '../map/ReadonlyMap';

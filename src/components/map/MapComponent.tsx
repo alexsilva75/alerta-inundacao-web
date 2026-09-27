@@ -1,8 +1,9 @@
 import { 
         MapContainer, 
         Marker, 
-        Popup, 
+        //Popup, 
         TileLayer,
+        useMap,
         useMapEvents 
     } from "react-leaflet";
 
@@ -19,10 +20,31 @@ import {useState, useEffect} from 'react';
 interface MapProps{
     onMapLocationSelect: (locacion: LatLng) => void;
     initialPosition?: LatLng;
+    location: LatLng | null;
 }
-export function MapComponent({onMapLocationSelect, initialPosition}: MapProps){
 
-    const [defaultPosition, setDefaultPosition] = useState<LatLng | null>(null);
+
+
+export function MapComponent({onMapLocationSelect, initialPosition, location}: MapProps){
+
+    function MapCenterUpdater({
+        latitude,
+        longitude,
+    }: {
+        latitude: number;
+        longitude: number;
+    }) {
+        const map = useMap();
+
+        useEffect(() => {
+            if(latitude && longitude){
+                map.setView([latitude, longitude], map.getZoom());
+
+            }
+        }, [latitude, longitude, map]);
+
+        return null;
+    }
 
     function MapEvents({
         onLocationSelect,
@@ -40,14 +62,18 @@ export function MapComponent({onMapLocationSelect, initialPosition}: MapProps){
         return null;
     }
 
+    const [defaultPosition, setDefaultPosition] = useState<LatLng | null>(null);
+
     
-    const [location, setLocation] = useState<LatLng | null>(null);
+
+    
+    // const [location, setLocation] = useState<LatLng | null>(null);
 
     //const [location, setLocation] = useState<LatLng | null>(null);
     const handleLocationSelection = (location: LatLng) => {   
         console.log('2 - MapComponent:', location);     
         onMapLocationSelect(location);
-        setLocation(location)
+        //setLocation(location)
     }
 
     useEffect(() => {  
@@ -100,6 +126,11 @@ export function MapComponent({onMapLocationSelect, initialPosition}: MapProps){
 
                 {/* <MapClickHandler onLocationSelect={handleLocationSelection} /> */}
                 <MapEvents onLocationSelect={handleLocationSelection} />
+
+                <MapCenterUpdater 
+                    latitude={location?.lat as number}
+                    longitude={location?.lng as number}
+                />
 
                 {location && (
                     <Marker position={location} />

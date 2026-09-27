@@ -18,10 +18,11 @@ import {useState, useReducer, useEffect} from 'react';
 import { LatLng } from 'leaflet';
 import { MapComponent } from '../../../components/map/MapComponent';
 import { fetchCidadesPorUF } from '../../../services/ibge-service';
-import dayjs, {Dayjs} from 'dayjs';
+import dayjs from 'dayjs';
 import { saveIncidente } from '../../../services/incidentes-service';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate } from 'react-router';
+import { fetchMunicipio } from '../../../services/ibge-service';
 
 import {
     DateTimePicker,
@@ -119,6 +120,21 @@ export function NewIncidente(){
         const cidades = await fetchCidadesPorUF(uf);
         setCidades(cidades);
     }
+
+    const handleCidadeChange = (cidade: string | null) => {
+        if (cidade){
+
+            setCidade(cidade);
+            dispatch({type: 'cidade', payload: cidade})
+            const municipio = fetchMunicipio(formState.uf, cidade);
+            
+            if(municipio){
+                setLocation(new LatLng(municipio.latitude, municipio.longitude))
+                
+            }
+        }
+    }
+
 
     async function handleSubmit(){
         const formData = new FormData();
@@ -280,7 +296,7 @@ export function NewIncidente(){
                 <Autocomplete
                     options={cidades}
                     value={formState.cidade}
-                    onChange={(_, novaCidade) => setCidade(novaCidade)}
+                    onChange={(_, novaCidade) => handleCidadeChange(novaCidade)}
                     fullWidth
                     renderInput={(params) => 
                     <TextField 
@@ -319,7 +335,7 @@ export function NewIncidente(){
                     <Typography sx={{mb: 2}}>
                         Selecione a localização do incidente no mapa abaixo.
                     </Typography>
-                    <MapComponent onMapLocationSelect={(location) => { handleSelectLocation(location) }}/>
+                    <MapComponent location={location} onMapLocationSelect={(location) => { handleSelectLocation(location) }}/>
                 </Box>
                 <Box>
                     <Button 

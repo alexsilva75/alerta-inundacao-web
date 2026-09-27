@@ -1,4 +1,3 @@
-import { Paper } from "@mui/material";
 import { useEffect } from "react";
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 
@@ -14,7 +13,7 @@ export function ReadonlyMap({
     latitude,
     longitude,
     zoom = 15,
-    height = 300,
+    //height = 300,
     marker = true,
 }: ReadonlyMapProps) {
 

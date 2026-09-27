@@ -1,13 +1,6 @@
 import {useState} from 'react';
 import {
-    Dashboard as DashBoardIcon,
-    Assignment as AssignmentIcon,
-    Event as EventIcon,
-    People as PeopleIcon,
-    Extension as ExtensionIcon,
-    Assessment as AssessmentIcon,
-    ManageAccounts as ManageAccountsIcon,
-    Search as SearchIcon,
+    Dashboard as DashBoardIcon,    
     Warning as WarningIcon,
     ExpandLess,
     ExpandMore,

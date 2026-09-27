@@ -14,6 +14,9 @@ export function StatCard({title, value}: StatCardProps){
     return (
         <Card>
             <CardContent>
+                <Typography>
+                    {title}
+                </Typography>
                 <Typography
                     variant="body2"
                     color="text.secondary"
