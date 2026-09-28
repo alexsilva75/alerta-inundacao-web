@@ -64,10 +64,17 @@ const getNivelColor = (nivel: string) => {
 
 import type { FetchIncidenteDto as Incidente } from "../dto/FetchIncidenteDto";
 import { IncidentDetailsDialog } from "../components/incidentes/IncidentDetailsDialog";
+import { fetchMunicipio, type Municipio } from '../services/ibge-service';
+import { SelectCidadeDialog } from '../components/home/SelectCidadeDialog';
+
+
 
 export function Home() {
+    const defaultCoords = {lat: -14.2350, lng: -51.9253};
+    const brazilCoords = {lat:-14.2350, lng: -51.9253 };
+    const defaultZoom = 4;
     const {user} = useAuth();
-    const [coords, setCoords] = useState<{lat: Number, lng: Number}>({lat: -12.5571238, lng: -38.7343115});
+    const [coords, setCoords] = useState<{lat: Number, lng: Number}>(defaultCoords);
     const [cidade, setCidade] = useState<string | null>(null);
     const [uf, setUf] = useState<string | null>(null);
     const [incidentes, setIncidentes] = useState<Incidente[] | []>([]);
@@ -76,6 +83,12 @@ export function Home() {
     const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
     const [selectedIncidente, setSelectedIncidente] = useState<Incidente | null>(null);
     const [searchError, setSearchError] = useState<string | null>(null);
+    const [municipio, setMunicipio] = useState<Municipio | null | undefined>(null);
+    const [showDefaultMap, setShowDefaultMap] = useState(false);
+    const [openRegionSelectDialog, setOpenRegionSelectDialog] = useState(false);
+    const [mapZoom, setMapZoom] = useState(defaultZoom);
+
+    console.log('openRegionSelectDialog', openRegionSelectDialog);
 
     function MapCenterUpdater({
         latitude,
@@ -87,7 +100,8 @@ export function Home() {
         const map = useMap();
 
         useEffect(() => {
-            map.setView([latitude, longitude], map.getZoom());
+            
+            map.setView([latitude, longitude], mapZoom);
         }, [latitude, longitude, map]);
 
         return null;
@@ -110,6 +124,7 @@ export function Home() {
             if(coords){
                 console.log('CHANGINS COORDS: ', coords);
                 setCoords(coords);   
+                setMapZoom(13);
             }
             setLoading(false); 
         }catch(error){
@@ -119,8 +134,38 @@ export function Home() {
         }
     }
 
+    const handleRegionSelect = (uf: string, cidade: string) => {
+        const fetchedMunicipio = fetchMunicipio(uf, cidade);
+        setMunicipio(fetchedMunicipio);
+
+        if(fetchedMunicipio){
+            setCoords({lat: fetchedMunicipio.latitude, lng: fetchedMunicipio.longitude});
+            setMapZoom(13);
+            setShowDefaultMap(false); 
+        }
+    }
+
+
+    const handleRegionSelectDialogClose = () =>{
+        if(!municipio){
+            setShowDefaultMap(true);
+            
+        }
+        setOpenRegionSelectDialog(false);
+    }
+
 
     const navigate = useNavigate();
+
+    useEffect(()=> {
+        if(showDefaultMap){
+            setOpenRegionSelectDialog(true);
+            setCoords(brazilCoords);
+            setMapZoom(4);
+            return
+        }
+       
+    }, [showDefaultMap]);
 
     useEffect(() => {       
         
@@ -130,16 +175,27 @@ export function Home() {
                 console.log("Obtendo coordenadas.");
                 setCoords({lat: position.coords.latitude,
                             lng: position.coords.longitude});             
-                
+                setMapZoom(13);
                 
             }, function(err){
                 console.log(err)
                 if(err.code == 2){                    
-                    setCoords({lat: -12.5571238, lng: -38.7343115})
+                    //setCoords({lat: -12.5571238, lng: -38.7343115})
+                    setShowDefaultMap(true);
+                    setOpenRegionSelectDialog(true);
+                }
+
+                if(err.code == 1){                    
+                    //setCoords({lat: -12.5571238, lng: -38.7343115})
+                    setShowDefaultMap(true);
+                    setOpenRegionSelectDialog(true);
                 }
             }, {});        
+        }else{
+            setShowDefaultMap(true);
+            setOpenRegionSelectDialog(true);
         }
-},[]);
+    },[]);
     
 
     useEffect(() => {
@@ -153,6 +209,9 @@ export function Home() {
         if(coords){
             console.log('USER COORDINATES: ', coords);
             resolveGeocoding(coords.lat, coords.lng);            
+        }else{
+            setShowDefaultMap(true);
+            setOpenRegionSelectDialog(true);
         }
     },[coords]);
 
@@ -550,6 +609,16 @@ export function Home() {
                     onClose={() => setOpenDetailsDialog(false)}
                     incidente={selectedIncidente}
                 />
+            )}
+
+            {openRegionSelectDialog && (
+                <SelectCidadeDialog
+                    onSelectRegiao={handleRegionSelect}
+                    open={openRegionSelectDialog}
+                    onClose={handleRegionSelectDialogClose}
+                >
+
+                </SelectCidadeDialog>
             )}
 
         </Box>
