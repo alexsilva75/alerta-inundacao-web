@@ -31,30 +31,39 @@ type IncidentSearchProps = {
 
 export function IncidentSearch({ onSearch }: IncidentSearchProps) {
 
+    
+
+
+
     const [expanded, setExpanded] = useState(false);
     const [coords, setCoords] = useState< {lat: number, lng: number}|null>(null);
 
-    const [uf, setUf] = useState("");
+
+    const [uf, setUf] = useState<string | null | undefined>("");
     //const[cidades, setCidades] = useState<string[] | []>([]);
-    const [cidade, setCidade] = useState<string | null>("");
+    const [cidade, setCidade] = useState<string | null | undefined>("");
     const [searchAtivo, setSearchAtivo] = useState(true);
     const [municipios, setMunicipios] = useState<Municipio[] | []>([]);
-    const [municipio, setMunicipio] = useState<Municipio | null>(null)
+    const [municipio, setMunicipio] = useState<Municipio | null>(null);
+
+    
 
     function handleSearch() {
         if (!uf || !cidade) {
             return;
         }
-
+                
         onSearch(uf, cidade, searchAtivo, coords);
     }
 
-    const handleUFChange = (event: SelectChangeEvent) => {
-            const selectedUf = event.target.value;
+    const handleUFChange = (event: SelectChangeEvent<string | null | undefined>) => {
+        const selectedUf = event.target.value;
+        if(selectedUf){
             setUf(selectedUf);
             const municipios = fetchMunicipios(selectedUf);
             setMunicipios(municipios);
         }
+    }
 
     return (
         <Accordion

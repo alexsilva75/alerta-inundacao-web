@@ -5,7 +5,8 @@ import {
     ExpandLess,
     ExpandMore,
     Add as AddIcon,
-    List as ListIcon
+    List as ListIcon,
+    Home as HomeIcon,
 } from '@mui/icons-material';
 
 import {
@@ -51,6 +52,13 @@ export function Sidebar(){
             <Divider />
 
             <List component="nav">
+                <ListItemButton onClick={() => navigate('/')}>
+                    <ListItemIcon>
+                        <HomeIcon />
+                    </ListItemIcon>
+
+                    <ListItemText primary="Ir para Home" />
+                </ListItemButton>
                 <ListItemButton onClick={() => navigate('/dashboard')}>
                     <ListItemIcon>
                         <DashBoardIcon />

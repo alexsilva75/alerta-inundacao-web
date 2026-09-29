@@ -34,7 +34,7 @@ import UpdateIcon from "@mui/icons-material/Update";
 //import type {LatLngExpression } from 'leaflet';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import {useNavigate} from 'react-router';
+import {useNavigate, useSearchParams} from 'react-router';
 
 import {useAuth} from '../contexts/AuthContext'
 import { reverseGeocoding } from "../services/geocoding-service";
@@ -70,6 +70,25 @@ import { SelectCidadeDialog } from '../components/home/SelectCidadeDialog';
 
 
 export function Home() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const paramUf = searchParams.get('uf') ?? '';
+    const paramCidade = searchParams.get('cidade') ?? '';
+    const paramAtivo = searchParams.get('ativo') ?? '';
+
+    useEffect(()=>{
+        // console.log('Param Ativo: ', paramAtivo);
+        // console.log('Param UF: ', paramUf);
+        // console.log('Param Cidade: ', paramCidade);
+
+        if(paramUf && paramCidade && paramAtivo){
+            const mun = fetchMunicipio(paramUf, paramCidade);
+            if(mun){
+                const searchAtivo = paramAtivo ? true : false;
+                handleSearch(paramUf, paramCidade, searchAtivo, {lat: mun.latitude, lng: mun.longitude});
+            }
+        }
+    },[paramUf, paramCidade,paramAtivo ]);
+
     const defaultCoords = {lat: -14.2350, lng: -51.9253};
     const brazilCoords = {lat:-14.2350, lng: -51.9253 };
     const defaultZoom = 4;
@@ -117,6 +136,13 @@ export function Home() {
         setLoading(true);
         setSearchError(null);
         console.log('COORDS: ', coords);
+
+        setSearchParams({
+            uf,
+            cidade,
+            ativo: ativo ? 'true' : 'false'
+        });
+
         try{
             const homeData = await homeSearch(cidade, uf, ativo);
             setIncidentes(homeData.data.incidentes);
@@ -137,8 +163,10 @@ export function Home() {
     const handleRegionSelect = (uf: string, cidade: string) => {
         const fetchedMunicipio = fetchMunicipio(uf, cidade);
         setMunicipio(fetchedMunicipio);
+        
 
         if(fetchedMunicipio){
+            handleSearch(uf, cidade, true,{lat: fetchedMunicipio.latitude, lng: fetchedMunicipio.longitude});
             setCoords({lat: fetchedMunicipio.latitude, lng: fetchedMunicipio.longitude});
             setMapZoom(13);
             setShowDefaultMap(false); 
@@ -170,9 +198,9 @@ export function Home() {
     useEffect(() => {       
         
         if("geolocation" in navigator) {
-            console.log("Obtendo localização");
+            //console.log("Obtendo localização");
             navigator.geolocation.getCurrentPosition(function(position) {
-                console.log("Obtendo coordenadas.");
+                //console.log("Obtendo coordenadas.");
                 setCoords({lat: position.coords.latitude,
                             lng: position.coords.longitude});             
                 setMapZoom(13);
@@ -187,8 +215,10 @@ export function Home() {
 
                 if(err.code == 1){                    
                     //setCoords({lat: -12.5571238, lng: -38.7343115})
-                    setShowDefaultMap(true);
-                    setOpenRegionSelectDialog(true);
+                    if(!paramUf && !paramCidade && !paramAtivo){
+                        setShowDefaultMap(true);
+                        setOpenRegionSelectDialog(true);
+                    }
                 }
             }, {});        
         }else{
@@ -224,9 +254,12 @@ export function Home() {
             setLoading(false);       
         }
 
-        if(cidade && uf){
+        if(!paramUf && !paramCidade){
 
-            loadHomeData(cidade, uf);
+            if(cidade && uf){
+                
+                loadHomeData(cidade, uf);
+            }
         }
     },[cidade, uf])
 
