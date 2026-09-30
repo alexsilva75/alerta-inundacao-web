@@ -75,19 +75,7 @@ export function Home() {
     const paramCidade = searchParams.get('cidade') ?? '';
     const paramAtivo = searchParams.get('ativo') ?? '';
 
-    useEffect(()=>{
-        // console.log('Param Ativo: ', paramAtivo);
-        // console.log('Param UF: ', paramUf);
-        // console.log('Param Cidade: ', paramCidade);
-
-        if(paramUf && paramCidade && paramAtivo){
-            const mun = fetchMunicipio(paramUf, paramCidade);
-            if(mun){
-                const searchAtivo = paramAtivo ? true : false;
-                handleSearch(paramUf, paramCidade, searchAtivo, {lat: mun.latitude, lng: mun.longitude});
-            }
-        }
-    },[paramUf, paramCidade,paramAtivo ]);
+    
 
     const defaultCoords = {lat: -14.2350, lng: -51.9253};
     const brazilCoords = {lat:-14.2350, lng: -51.9253 };
@@ -135,7 +123,7 @@ export function Home() {
     const handleSearch = async (uf: string, cidade:string, ativo:boolean, coords: {lat: number, lng: number} | null) =>{
         setLoading(true);
         setSearchError(null);
-        console.log('COORDS: ', coords);
+        //console.log('COORDS: ', coords);
 
         setSearchParams({
             uf,
@@ -147,8 +135,7 @@ export function Home() {
             const homeData = await homeSearch(cidade, uf, ativo);
             setIncidentes(homeData.data.incidentes);
             setStats(homeData.data.stats);  
-            if(coords){
-                console.log('CHANGINS COORDS: ', coords);
+            if(coords){                
                 setCoords(coords);   
                 setMapZoom(13);
             }
@@ -176,8 +163,7 @@ export function Home() {
 
     const handleRegionSelectDialogClose = () =>{
         if(!municipio){
-            setShowDefaultMap(true);
-            
+            setShowDefaultMap(true);            
         }
         setOpenRegionSelectDialog(false);
     }
@@ -196,34 +182,35 @@ export function Home() {
     }, [showDefaultMap]);
 
     useEffect(() => {       
-        
-        if("geolocation" in navigator) {
-            //console.log("Obtendo localização");
-            navigator.geolocation.getCurrentPosition(function(position) {
-                //console.log("Obtendo coordenadas.");
-                setCoords({lat: position.coords.latitude,
-                            lng: position.coords.longitude});             
-                setMapZoom(13);
+        if(!paramUf && !paramCidade){
+            if("geolocation" in navigator) {
                 
-            }, function(err){
-                console.log(err)
-                if(err.code == 2){                    
-                    //setCoords({lat: -12.5571238, lng: -38.7343115})
-                    setShowDefaultMap(true);
-                    setOpenRegionSelectDialog(true);
-                }
-
-                if(err.code == 1){                    
-                    //setCoords({lat: -12.5571238, lng: -38.7343115})
-                    if(!paramUf && !paramCidade && !paramAtivo){
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    
+                    setCoords({lat: position.coords.latitude,
+                                lng: position.coords.longitude});             
+                    setMapZoom(13);
+                    
+                }, function(err){
+                    console.log(err)
+                    if(err.code == 2){                    
+                        
                         setShowDefaultMap(true);
                         setOpenRegionSelectDialog(true);
                     }
-                }
-            }, {});        
-        }else{
-            setShowDefaultMap(true);
-            setOpenRegionSelectDialog(true);
+
+                    if(err.code == 1){                    
+                        // Usuário não permitiu localização
+                        if(!paramUf && !paramCidade && !paramAtivo){
+                            setShowDefaultMap(true);
+                            setOpenRegionSelectDialog(true);
+                        }
+                    }
+                }, {});        
+            }else{
+                setShowDefaultMap(true);
+                setOpenRegionSelectDialog(true);
+            }
         }
     },[]);
     
@@ -237,7 +224,7 @@ export function Home() {
         }
         
         if(coords){
-            console.log('USER COORDINATES: ', coords);
+            //console.log('USER COORDINATES: ', coords);
             resolveGeocoding(coords.lat, coords.lng);            
         }else{
             setShowDefaultMap(true);
@@ -254,14 +241,38 @@ export function Home() {
             setLoading(false);       
         }
 
-        if(!paramUf && !paramCidade){
+        if(paramUf && paramCidade){
+            // const ativo = paramAtivo === 'true' ? true : false;
+            // handleSearch(paramUf, paramCidade, ativo, coords as {lat: number, lng: number});
+            return;
+        }
 
-            if(cidade && uf){
-                
-                loadHomeData(cidade, uf);
+        if(cidade && uf){            
+            loadHomeData(cidade, uf);
+        }
+       
+    },[cidade, uf, paramUf, paramCidade, municipio]);
+
+    useEffect(()=>{
+        // console.log('Param Ativo: ', paramAtivo);
+        // console.log('Param UF: ', paramUf);
+        // console.log('Param Cidade: ', paramCidade);
+
+        if(paramUf && paramCidade && paramAtivo){
+            setUf(paramUf);
+            setCidade(paramCidade);
+            
+            
+            const mun = fetchMunicipio(paramUf, paramCidade);
+
+            if(mun){
+                setMunicipio(mun);
+                setCoords({ lat: mun.latitude, lng: mun.longitude });
+                const searchAtivo = paramAtivo === 'true' ? true : false;
+                handleSearch(paramUf, paramCidade, searchAtivo, {lat: mun.latitude, lng: mun.longitude});
             }
         }
-    },[cidade, uf])
+    },[paramUf, paramCidade,paramAtivo ]);
 
     return (
         <Box sx={{ p: { xs: 2, md: 3 } }}>
