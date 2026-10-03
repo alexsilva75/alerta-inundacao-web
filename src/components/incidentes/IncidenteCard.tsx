@@ -1,118 +1,255 @@
-import { Box, Button, Card, CardContent, Chip, Grid, Stack, Typography } from "@mui/material"
-import type { FetchIncidenteDto as Incidente } from "../../dto/FetchIncidenteDto"
-import { tempoRelativo } from "../../utils/dateFormat"
-import { getNivelColor } from "../../utils/ui"
 
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    Divider,
+    Stack,
+    Typography,
+} from "@mui/material";
 
-interface IncidentCardProps{
+import PlaceOutlinedIcon from "@mui/icons-material/PlaceOutlined";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+
+import type { FetchIncidenteDto as Incidente } from "../../dto/FetchIncidenteDto";
+import { tempoRelativo } from "../../utils/dateFormat";
+import { getNivelColor } from "../../utils/ui";
+
+interface IncidentCardProps {
     incidente: Incidente;
     onViewDetails: (incidente: Incidente) => void;
     onEdit: (incidente: Incidente) => void;
 }
 
-export function IncidentCard({incidente, onViewDetails, onEdit}: IncidentCardProps){
-    
+export function IncidentCard({
+    incidente,
+    onViewDetails,
+    onEdit,
+}: IncidentCardProps) {
+
+    const nivelColor = getNivelColor(incidente.nivel_severidade);
+
+    const severityColors = {
+        error: "#d32f2f",
+        warning: "#ed6c02",
+        success: "#2e7d32",
+        default: "#9e9e9e",
+    };
+
+    const indicatorColor =
+        severityColors[nivelColor as keyof typeof severityColors]
+        ?? severityColors.default;
 
     return (
         <Card
-            
-            variant="outlined"            
+            variant="outlined"
             sx={{
-                cursor: "pointer",
-                transition: "0.2s",
-
+                borderRadius: 3,
+                position: "relative",
+                overflow: "hidden",
+                transition: "all 0.2s ease",
                 "&:hover": {
                     boxShadow: 3,
                     transform: "translateY(-2px)",
+                    borderColor: "divider",
                 },
             }}
         >
+            {/* Indicador de severidade */}
+            <Box
+                sx={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 5,
+                    bgcolor: indicatorColor,
+                }}
+            />
 
-            <CardContent>
-                <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
-                    <Stack                                             
+            <CardContent
+                sx={{
+                    p: 2.5,
+                    pl: 3,
+                }}
+            >
+                <Stack
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2,
+                    }}
+                >
+                    {/* Cabeçalho */}
+                    <Stack
                         sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: 1
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                            gap: 1,
                         }}
-                        
                     >
-
-                        <Box>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
                             <Typography
                                 variant="subtitle1"
                                 sx={{
-                                    fontWeight: 700
+                                    fontWeight: 700,
+                                    lineHeight: 1.3,
+                                    overflowWrap: "anywhere",
                                 }}
                             >
                                 {incidente.titulo}
                             </Typography>
 
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
+                            <Stack
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                    mt: 0.75,
+                                }}
                             >
-                                {incidente.bairro}
-                            </Typography>
+                                <PlaceOutlinedIcon
+                                    sx={{
+                                        fontSize: 16,
+                                        color: "text.secondary",
+                                    }}
+                                />
+
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                >
+                                    {incidente.bairro}
+                                </Typography>
+                            </Stack>
                         </Box>
 
-                        <Grid container spacing={2}>                                            
+                        <Stack
+                            sx={{
+                                display: "flex",
+                                flexDirection: "row",
+                                flexWrap: "wrap",
+                                justifyContent: "flex-end",
+                                gap: 0.75,
+                            }}
+                        >
                             <Chip
                                 label={incidente.nivel_severidade}
                                 color={
-                                    getNivelColor(
-                                        incidente.nivel_severidade
-                                    ) as
+                                    nivelColor as
                                         | "error"
                                         | "warning"
                                         | "success"
                                         | "default"
                                 }
                                 size="small"
+                                sx={{ fontWeight: 600 }}
                             />
 
-                            {incidente.ativo ? 
-                                <Chip
-                                    label="Ativo"
-                                    color="error"
-                                    size="small"
-                                />
-                                : 
-                                <Chip
-                                    label="Inativo"
-                                    color="default"
-                                    size="small"
-                                />}
-                            </Grid>
+                            <Chip
+                                label={incidente.ativo ? "Ativo" : "Inativo"}
+                                color={incidente.ativo ? "error" : "default"}
+                                variant={incidente.ativo ? "filled" : "outlined"}
+                                size="small"
+                            />
+                        </Stack>
                     </Stack>
-                    <Box>
-                        <Button onClick={() => onViewDetails(incidente)} sx={{mr: 2}} variant="outlined">Detalhes</Button>
-                        <Button onClick={() => onEdit(incidente)}  variant="contained">Editar</Button>
-                    </Box>
-                </Box>
 
-                <Typography
-                    variant="body2"
-                    sx={{ mt: 1.5 }}
-                >
-                    {incidente.descricao}
-                </Typography>
+                    {/* Descrição */}
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            lineHeight: 1.5,
+                            minHeight: "3em",
+                        }}
+                    >
+                        {incidente.descricao}
+                    </Typography>
 
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{
-                        display: "block",
-                        mt: 1.5,
-                    }}
-                >
-                    Atualizado {tempoRelativo(incidente.created_at)}
-                </Typography>
+                    <Divider />
 
+                    {/* Rodapé */}
+                    <Stack
+                        sx={{
+                            display: "flex",
+                            flexDirection: {
+                                xs: "column",
+                                sm: "row",
+                            },
+                            justifyContent: "space-between",
+                            alignItems: {
+                                xs: "stretch",
+                                sm: "center",
+                            },
+                            gap: 1.5,
+                        }}
+                    >
+                        <Stack
+                            sx={{
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 0.5,
+                            }}
+                        >
+                            <AccessTimeOutlinedIcon
+                                sx={{
+                                    fontSize: 16,
+                                    color: "text.secondary",
+                                }}
+                            />
+
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                            >
+                                Atualizado {tempoRelativo(incidente.created_at)}
+                            </Typography>
+                        </Stack>
+
+                        <Stack
+                            sx={{
+                                display: "flex",
+                                flexDirection: "row",
+                                gap: 1,
+                                justifyContent: "flex-end",
+                            }}
+                        >
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                startIcon={<VisibilityOutlinedIcon />}
+                                onClick={() => onViewDetails(incidente)}
+                                sx={{ borderRadius: 2 }}
+                            >
+                                Detalhes
+                            </Button>
+
+                            <Button
+                                size="small"
+                                variant="contained"
+                                startIcon={<EditOutlinedIcon />}
+                                onClick={() => onEdit(incidente)}
+                                sx={{ borderRadius: 2 }}
+                            >
+                                Editar
+                            </Button>
+                        </Stack>
+                    </Stack>
+                </Stack>
             </CardContent>
-
         </Card>
-    )
+    );
 }

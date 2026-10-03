@@ -260,8 +260,7 @@ export function Home() {
 
         if(paramUf && paramCidade && paramAtivo){
             setUf(paramUf);
-            setCidade(paramCidade);
-            
+            setCidade(paramCidade);            
             
             const mun = fetchMunicipio(paramUf, paramCidade);
 

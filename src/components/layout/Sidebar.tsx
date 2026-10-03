@@ -7,6 +7,8 @@ import {
     Add as AddIcon,
     List as ListIcon,
     Home as HomeIcon,
+    Person as PersonIcon,
+    
 } from '@mui/icons-material';
 
 import {
@@ -23,10 +25,12 @@ import {
 } from '@mui/material';
 
 import {useNavigate} from 'react-router';
+import {useAuth} from '../../contexts/AuthContext';
 
 export function Sidebar(){
     const navigate = useNavigate();
     const [incidentesOpen, setIncidentesOpen] = useState(false);
+    const {user} = useAuth();
 
 
     return (
@@ -104,17 +108,18 @@ export function Sidebar(){
 
                             <ListItemText primary="Meus Incidentes"/>
                         </ListItemButton>
-
-
                         
                     </List>
                 </Collapse>
-                {/* <ListItemButton>
-                    <ListItemIcon>
-                        <SearchIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Buscar incidentes" />
-                </ListItemButton> */}
+
+                {!!user?.is_admin && (
+                    <ListItemButton>
+                        <ListItemIcon>
+                            <PersonIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Gerenciar Usuários" />
+                    </ListItemButton>
+                )}
             </List>
 
         </Box>

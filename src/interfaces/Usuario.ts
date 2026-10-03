@@ -5,5 +5,6 @@ export interface User{
     email_verified_at?: Date,
     created_at?: Date,
     updated_at?: Date, 
+    is_admin: boolean,
 
 }
